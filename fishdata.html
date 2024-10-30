@@ -16,6 +16,10 @@
         .container {
             display: flex;
         }
+
+        .bereiche {
+            height: 80px;
+        }
     </style>
 </head>
 
@@ -24,51 +28,27 @@
     <h1>Fischereien Karte</h1>
     <div class="container">
         <div id="map"></div>
-        <div id="fiter-checkbox"></div>
-        <!-- <div class="inputs">
-            <label><input type="checkbox" id="fischerei"> Fischerei</label><br>
-            <label><input type="checkbox" id="räucherei"> Räucherei</label><br>
-            <label><input type="checkbox" id="teichwirtschaft"> Teichwirtschaft</label><br>
-            <label><input type="checkbox" id="aquakultur"> Aquakultur</label><br>
-            <label><input type="checkbox" id="eigener_fang"> Eigenfang</label><br>
-            <label><input type="checkbox" id="regionaler_fang"> Regionaler Fang</label><br>
-            <label><input type="checkbox" id="küstenfischerei"> Küstenfischerei</label><br>
-            <label><input type="checkbox" id="binnenfischerei"> Binnenfischerei</label><br>
-            <label><input type="checkbox" id="restaurant"> Restaurant</label><br>
-            <label><input type="checkbox" id="museum"> Museum</label><br>
-            <label><input type="checkbox" id="händler"> Händler</label><br>
-            <label><input type="checkbox" id="imbiss"> Imbiss</label><br>
-            <label><input type="checkbox" id="direktverkauf"> Direktverkauf</label><br>
-            <label><input type="checkbox" id="fischbrötchen"> Fischbrötchen</label><br>
-            <label><input type="checkbox" id="räucherfisch"> Räucherfisch</label><br>
-            <label><input type="checkbox" id="aal"> Aal</label><br>
-            <label><input type="checkbox" id="forelle"> Forelle</label><br>
-            <label><input type="checkbox" id="saibling"> Saibling</label><br>
-            <label><input type="checkbox" id="karpfen"> Karpfen</label><br>
-            <label><input type="checkbox" id="stör"> Stör</label><br>
-            <label><input type="checkbox" id="wels"> Wels</label><br>
-            <label><input type="checkbox" id="hecht"> Hecht</label><br>
-            <label><input type="checkbox" id="zander"> Zander</label><br>
-            <label><input type="checkbox" id="kaviar"> Kaviar</label><br>
-            <label><input type="checkbox" id="krabben"> Krabben</label><br>
-            <label><input type="checkbox" id="krebs"> Krebs</label><br>
-            <label><input type="checkbox" id="algen"> Algen</label><br>
-            <label><input type="checkbox" id="onlineshop"> Onlineshop</label><br>
-            <label><input type="checkbox" id="beherbergung"> Beherbergung</label><br>
-            <label><input type="checkbox" id="gäste-fahrten"> Gäste-Fahrten</label><br>
-            <label><input type="checkbox" id="charter"> Charter</label><br>
-            <label><input type="checkbox" id="seebestattung"> Seebestattung</label><br>
-            <label><input type="checkbox" id="angeln"> Angeln</label><br>
-            <label><input type="checkbox" id="liegeplätze"> Liegeplätze</label><br>
-            <label><input type="checkbox" id="nachhaltig"> Nachhaltig</label><br>
-            <label><input type="checkbox" id="msc"> MSC</label><br>
-            <label><input type="checkbox" id="besucht"> Besucht</label><br>
-            <label><input type="checkbox" id="goldener_seestern"> Goldener Seestern</label><br>
-            <label><input type="checkbox" id="bewertung"> Bewertung</label><br>
-        </div> -->
+        <div class="filter">
+            <div class="filter-selectbox">
+                <label for="category">Kategorie</label>
+                <select name="category" id="category">
+                    <option value="alle" selected>alle</option>
+                    <option value="fischerei">Fischerei</option>
+                    <option value="fischzucht">Fischzucht</option>
+                    <option value="raeucherei">Räucherei</option>
+                    <option value="haendler">Händler</option>
+                    <option value="gastronomie">Gastronomie</option>
+                    <option value="kultur">Kultur</option>
+                </select>
+                <div class="bereiche" id="bereiche">
+
+                </div>
+            </div>
+            <div id="filter-checkbox"></div>
+        </div>
     </div>
 
-    <div id="fiter-checkbox"></div>
+
 
 
 
@@ -76,12 +56,13 @@
     <!-- Skript, um die Google Maps API dynamisch zu laden -->
     <script>
         const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap&v=weekly&libraries=marker`;
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
     </script>
     <script src="./fishdata.js"></script>
+    <script src="./fishdatamvp.js"></script>
     <script src="./script.js"></script>
     <script>
         "use strict";
