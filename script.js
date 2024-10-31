@@ -1,56 +1,7 @@
 let map;
 let markers = [];
-let checkboxes = "";
-let selectboxes = "";
 
-function selectbox() {
-  // Selectbox generieren
-  let selectboxes = "";
-  const selectedValue = document.getElementById("category").value;
-  console.log(selectedValue);
-
-  if (selectedValue === "fischerei") {
-    selectboxes += `<label><input type='checkbox' id="küstenfischerei">Küstenfischerei</label><br>`;
-    selectboxes += `<label><input type='checkbox' id="binnenfischerei">Binnenfischerei</label><br>`;
-  }
-  if (selectedValue === "fischzucht") {
-    selectboxes += `<label><input type='checkbox' id="teichwirtschaft">Teichwirtschaft</label><br>`;
-    selectboxes += `<label><input type='checkbox' id="aquakultur">Aquakultur</label><br>`;
-  }
-  if (selectedValue === "gastronomie") {
-    selectboxes += `<label><input type='checkbox' id="restaurant">Restaurant</label><br>`;
-    selectboxes += `<label><input type='checkbox' id="imbiss">Imbiss</label><br>`;
-  }
-  document.getElementById("bereiche").innerHTML = selectboxes;
-
-  // Hinzufügen von Event Listener für die dynamisch erstellten Checkboxen
-  document
-    .querySelectorAll("#bereiche input[type='checkbox']")
-    .forEach((checkbox) => {
-      checkbox.addEventListener("change", filterPins);
-    });
-
-  // Filterfunktion aufrufen, wenn Select-Box geändert wird
-  filterPins();
-}
-
-function checkbox() {
-  //Checkboxes - Direktverkauf, Onlineshop, goldener Seestern -  generieren
-  const filter = Object.keys(fishdatamvp[0]).slice(30, 33); // keys extrahieren
-  console.log(filter);
-
-  filter.forEach((element, index) => {
-    const id = element.toLocaleLowerCase();
-    checkboxes += `<label><input type='checkbox' id="${id}">${element}</label><br>`;
-  });
-  document.getElementById("filter-checkbox").innerHTML = checkboxes;
-
-  // Event Listener für Checkboxen hinzufügen
-  filter.forEach((element) => {
-    const id = element.toLocaleLowerCase();
-    document.getElementById(id).addEventListener("change", filterPins);
-  });
-}
+/////////// MAP ////////////
 
 // Funktion zur Initialisierung der Karte
 function initMap() {
@@ -59,7 +10,7 @@ function initMap() {
   const center = { lat: 51.1657, lng: 10.4515 }; // Zentrum in Deutschland
   const mapOptions = {
     center: center,
-    zoom: 6,
+    zoom: 8,
     mapId: "3c9fedfcb52e5828",
   };
   map = new google.maps.Map(document.getElementById("map"), mapOptions);
@@ -69,15 +20,23 @@ function initMap() {
 // Sicherstellen, dass initMap global verfügbar ist
 window.initMap = initMap;
 
+/////////// INITIAL PINS ON MAP ////////////
+
 function showPins(pins) {
   clearMarkers(); // Zuerst alte Marker entfernen
   pins.forEach((location) => {
-    const marker = new google.maps.marker.AdvancedMarkerElement({
-      position: { lat: location.Lat, lng: location.Long },
-      map: map,
-      title: location.Name, // Tooltip
-    });
-    markers.push(marker); // Speichere Marker in Array
+    if (location.Ausschließen !== true) {
+      const marker = new google.maps.marker.AdvancedMarkerElement({
+        position: { lat: location.Lat, lng: location.Long },
+        map: map,
+        title: location.Name,
+      });
+      console.log(location);
+      // Listener für Klick-Event mit Übergabe der Location-Daten
+      marker.addListener("click", () => openDetailPage(location));
+
+      markers.push(marker); // Speichere Marker in Array
+    }
   });
 }
 
@@ -86,6 +45,8 @@ function clearMarkers() {
   markers.forEach((marker) => marker.setMap(null)); // Entferne Marker von der Karte
   markers = []; // Leere das Marker-Array
 }
+
+/////////// FILTER PINS ON MAP ////////////
 
 /* Funktionsweise
 1. Dynamisches Erfassen aller Checkboxen: Mit document.querySelectorAll("input[type='checkbox']") erfassen wir alle Checkboxen auf der Seite.
@@ -97,14 +58,15 @@ function filterPins() {
     // Gehe durch alle Checkboxen, die auf der Seite vorhanden sind
     const checkboxes = document.querySelectorAll("input[type='checkbox']");
     const selectedCategory = document.getElementById("category").value;
-    console.log(selectedCategory);
 
     for (let checkbox of checkboxes) {
       // Prüfe, ob die Checkbox aktiviert ist und ob `location` die entsprechende Eigenschaft nicht hat
       if (checkbox.checked) {
-        const key = checkbox.id.charAt(0).toUpperCase() + checkbox.id.slice(1); // Passe den Namen des Attributs an
+        const key = checkbox.id;
+        console.log(key);
 
         if (!location[key]) return false; // Wenn das Attribut fehlt, schließen wir diesen Pin aus
+        // if (!location.Ausschließen) return false; // Wenn Ausschließen auf true ist, schließe Pin aus
       }
     }
 
@@ -122,57 +84,104 @@ function filterPins() {
   showPins(filteredPins);
 }
 
-//Eventhandler für Select
-document.getElementById("category").addEventListener("change", selectbox);
-// document
-//   .getElementById("küstenfischerei")
-//   .addEventListener("change", filterPins);
-// document
-//   .getElementById("binnenfischerei")
-//   .addEventListener("change", filterPins);
+// ALLE FILTER ZURÜCKSETZEN
+document.getElementById("clearFilter").addEventListener("click", () => {
+  // Setze alle Checkboxen zurück
+  document.querySelectorAll("input[type='checkbox']").forEach((checkbox) => {
+    checkbox.checked = false;
+  });
 
-// Event-Listener für alle Checkboxen hinzufügen
-// document.getElementById("fischerei").addEventListener("change", filterPins);
-// document.getElementById("räucherei").addEventListener("change", filterPins);
-// document
-//   .getElementById("teichwirtschaft")
-//   .addEventListener("change", filterPins);
-// document.getElementById("aquakultur").addEventListener("change", filterPins);
-// document.getElementById("eigener_fang").addEventListener("change", filterPins);
-// document
-//   .getElementById("regionaler_fang")
-//   .addEventListener("change", filterPins);
+  // Setze die Kategorieauswahl
+  document.getElementById("category").value = "alle";
 
-// document.getElementById("restaurant").addEventListener("change", filterPins);
-// document.getElementById("museum").addEventListener("change", filterPins);
-// document.getElementById("händler").addEventListener("change", filterPins);
-// document.getElementById("imbiss").addEventListener("change", filterPins);
-// document.getElementById("direktverkauf").addEventListener("change", filterPins);
-// document.getElementById("fischbrötchen").addEventListener("change", filterPins);
-// document.getElementById("räucherfisch").addEventListener("change", filterPins);
-// document.getElementById("aal").addEventListener("change", filterPins);
-// document.getElementById("forelle").addEventListener("change", filterPins);
-// document.getElementById("saibling").addEventListener("change", filterPins);
-// document.getElementById("karpfen").addEventListener("change", filterPins);
-// document.getElementById("stör").addEventListener("change", filterPins);
-// document.getElementById("wels").addEventListener("change", filterPins);
-// document.getElementById("hecht").addEventListener("change", filterPins);
-// document.getElementById("zander").addEventListener("change", filterPins);
-// document.getElementById("kaviar").addEventListener("change", filterPins);
-// document.getElementById("krabben").addEventListener("change", filterPins);
-// document.getElementById("krebs").addEventListener("change", filterPins);
-// document.getElementById("algen").addEventListener("change", filterPins);
-// document.getElementById("onlineshop").addEventListener("change", filterPins);
-// document.getElementById("beherbergung").addEventListener("change", filterPins);
-// document.getElementById("gäste-fahrten").addEventListener("change", filterPins);
-// document.getElementById("charter").addEventListener("change", filterPins);
-// document.getElementById("seebestattung").addEventListener("change", filterPins);
-// document.getElementById("angeln").addEventListener("change", filterPins);
-// document.getElementById("liegeplätze").addEventListener("change", filterPins);
-// document.getElementById("nachhaltig").addEventListener("change", filterPins);
-// document.getElementById("msc").addEventListener("change", filterPins);
-// document.getElementById("besucht").addEventListener("change", filterPins);
-// document
-//   .getElementById("goldener_seestern")
-//   .addEventListener("change", filterPins);
-// document.getElementById("bewertung").addEventListener("change", filterPins);
+  // Zeige alle initialen Pins ohne Filter an
+  showPins(fishdatamvp);
+});
+
+/////////// DETAIL PAGE ////////////
+
+// OPEN DETAILPAGE AND FILL DETAILSPAGE DYNAMICALLY
+
+function openDetailPage(location) {
+  const detailPage = document.getElementById("detailPage");
+
+  if (detailPage.style.display === "none" || detailPage.style.display === "") {
+    detailPage.style.display = "block";
+  }
+  document
+    .getElementById("close-detailPage")
+    .addEventListener("click", closeDetailPage);
+  function closeDetailPage() {
+    detailPage.style.display = "none";
+  }
+
+  const imgElement = document.querySelector(".detailPage-img");
+  imgElement.src = location.Bild;
+
+  document.querySelector(".detailPage-info>h2").innerText = location.Name;
+
+  if (location.goldener_Seestern === true) {
+    document.querySelector(".seestern").innerHTML =
+      "<img src='./seestern.png' alt='Auszeichnung Goldener Seestern' class='seestern'>";
+  } else {
+    // Bild entfernen, wenn goldener_Seestern false ist
+    document.querySelector(".seestern").innerHTML = "";
+  }
+
+  // Löschen von bestehenden buttons
+  const filterContainer = document.querySelector(".detailPage-info-filter");
+  filterContainer.innerHTML = ""; // Clear previous buttons
+
+  // Generiere buttons based on true keys
+  const filterKeys = [
+    "Küstenfischerei",
+    "Binnenfischerei",
+    "Teichwirtschaft",
+    "Aquakultur",
+    "Restaurant",
+    "Imbiss",
+    "Direktverkauf",
+    "Onlineshop",
+  ];
+  filterKeys.forEach((key) => {
+    if (location[key] === true) {
+      filterContainer.innerHTML += `<button>${key}</button>`;
+    }
+  });
+
+  const filterContainer2 = document.querySelector(".detailPage-info-filter2");
+  filterContainer2.innerHTML = ""; // Clear previous buttons
+
+  // Generiere buttons based on true keys
+  const filterKeys2 = [
+    "Eigener_Fang",
+    "Regionaler_Fang",
+    "Räucherfisch",
+    "Fischbrötchen",
+  ];
+  filterKeys2.forEach((key) => {
+    if (location[key] === true) {
+      filterContainer2.innerHTML += `<button>${key.replace("_", " ")}</button>`;
+    }
+  });
+
+  document.querySelector(
+    ".detailPage-info .detailPage-info-description"
+  ).innerText = location.Beschreibung;
+  document.querySelector(".detailPage-info-address-street").innerText =
+    location.Adresse;
+  document.querySelector(".detailPage-info-address-zip").innerText =
+    location.PLZ;
+  document.querySelector(".detailPage-info-address-city").innerText =
+    location.Stadt;
+  document.querySelector(".detailPage-info-address-city").innerText =
+    location.Stadt;
+  document.querySelector(".detailPage-info-mail").innerText = location.E_Mail;
+  document.querySelector(".detailPage-info-web").innerText = location.Webseite;
+  document.querySelector(".detailPage-info-googlelink").innerText =
+    location.Webseite;
+  document.querySelector(".detailPage-info-socials-insta").innerText =
+    "Ich werde ein hüpsches Insta Logo, toll <3";
+  document.querySelector(".detailPage-info-socials-fb").innerText =
+    "Ich werde ein hüpsches Facebook Logo, toll <3";
+}

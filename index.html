@@ -6,31 +6,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Karte anzeigen</title>
     <style>
-        #map {
-            height: 80vh;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
+        #map {
+            height: 100vh;
             width: 100%;
 
         }
 
-        .container {
+        .map-container {
             display: flex;
+            position: relative;
         }
 
-        .bereiche {
+        .map-bereiche {
             height: 80px;
+        }
+
+        .map-filter-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            padding: 8px 12px;
+        }
+
+        .map-filter {
+            display: none;
+            z-index: 1000;
+            position: absolute;
+            background-color: #c6c6c6;
+            padding: 20px;
+            width: 250px;
+            height: 80%;
+            top: 73px;
+            left: 56px;
+            border-radius: 30px;
+
+        }
+
+        .map-filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: top;
+            margin-bottom: 10px;
+        }
+
+        .close-button {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .gm-style-mtc {
+            display: none;
+        }
+
+        .detailPage-container {
+            background-color: #FFFFFF;
+            height: 100vh;
+            width: 50%;
+            position: absolute;
+            right: 25%;
+            display: none;
+
+        }
+
+        .detailPage-img {
+            width: 100%;
+            height: 50%;
+            object-fit: cover;
+        }
+
+        #close-detailPage {
+            position: absolute;
+            right: 10px;
+            background-color: #c6c6c6;
+            padding: 20px;
+        }
+
+        .close-button {
+            cursor: pointer;
+        }
+
+        .seestern {
+            height: 30px;
+            width: 30px;
         }
     </style>
 </head>
 
 <body>
 
-    <h1>Fischereien Karte</h1>
-    <div class="container">
+
+    <div class="map-container">
+        <button class="map-filter-btn" id="filter-btn">Filter</button>
         <div id="map"></div>
-        <div class="filter">
-            <div class="filter-selectbox">
-                <label for="category">Kategorie</label>
+        <div class="map-filter" id="filter">
+            <div class="map-filter-header">
+                <h2>Filter</h2>
+                <div class="close-button" id="close-filter">X</div>
+            </div>
+            <div class="map-filter-selectbox">
                 <select name="category" id="category">
                     <option value="alle" selected>alle</option>
                     <option value="fischerei">Fischerei</option>
@@ -40,11 +120,39 @@
                     <option value="gastronomie">Gastronomie</option>
                     <option value="kultur">Kultur</option>
                 </select>
-                <div class="bereiche" id="bereiche">
+                <div class="map-bereiche" id="bereiche">
 
                 </div>
             </div>
             <div id="filter-checkbox"></div>
+            <a href="#" id="clearFilter">Alle zurücksetzen</a>
+        </div>
+        <div class="detailPage-container" id="detailPage">
+            <div class="close-button" id="close-detailPage">X</div>
+            <img src="" alt="Foto des gewählten Ortes" class="detailPage-img">
+            <div class="detailPage-info">
+                <h2></h2>
+                <div class="seestern" id="seestern"></div>
+                <div class="detailPage-info-filter"></div>
+                <div class="detailPage-info-filter-fish"></div>
+                <div class="detailPage-info-description"></div>
+                <div class="detailPage-info-address">
+                    <p class="detailPage-info-address-street"></p>
+                    <p class="detailPage-info-address-zip"></p>
+                    <p class="detailPage-info-address-city"></p>
+                    <p class="detailPage-info-address-fon"></p>
+                </div>
+                <div class="detailPage-info-mail"></div>
+                <div class="detailPage-info-web"></div>
+                <div class="detailPage-info-googlelink"></div>
+                <div class="detailPage-info-socials">
+                    <div class="detailPage-info-socials-insta"></div>
+                    <div class="detailPage-info-socials-fb"></div>
+                </div>
+                <div class="detailPage-info-filter2"></div>
+
+
+            </div>
         </div>
     </div>
 
@@ -64,12 +172,8 @@
     <script src="./fishdata.js"></script>
     <script src="./fishdatamvp.js"></script>
     <script src="./script.js"></script>
-    <script>
-        "use strict";
+    <script src="./createInputs.js"></script>
 
-
-
-    </script>
 
 </body>
 
